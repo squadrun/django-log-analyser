@@ -9,8 +9,8 @@ os.chdir(os.path.normpath(os.path.join(os.path.abspath(__file__), os.pardir)))
 
 setup(
     name='django-log-analyser',
-    version='0.2',
-    packages=find_packages(where='log_analyser'),
+    version='0.2.0',
+    packages=find_packages(),
     install_requires=[
         'boto3==1.3.1',
         'django>=1.7',

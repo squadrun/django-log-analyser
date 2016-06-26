@@ -31,13 +31,12 @@ Quick start
 
     INSTALLED_APPS = [
         ...
-        'log_analyser.log_management',
-        'log_analyser.analyser_pgbadger',
+        'log_analyser',
     ]
 
 2. Include the log_analyser URLconf in your project urls.py like this::
 
-    url(r'', include('log_analyser.log_analyser.urls')),
+    url(r'', include('log_analyser.urls')),
 
 3. "log_analyser" needs you to add a few constants to your settings::
 
