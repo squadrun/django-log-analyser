@@ -1,0 +1,7 @@
+-   repo: git@github.com:pre-commit/pre-commit-hooks
+    sha: 616c1ebd1898c91de9a0548866a59cbd9f4547f6
+    hooks:
+    -   id: trailing-whitespace
+    -   id: flake8
+        args:
+        - --max-line-length=120

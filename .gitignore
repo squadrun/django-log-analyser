@@ -1,0 +1,28 @@
+*.py[cod]
+*.log
+*.pot
+
+# Unit test / coverage reports
+.coverage
+.tox
+
+# Translations
+*.mo
+
+# Developer
+.pydevproject
+.project
+.settings/
+.idea/
+.DS_Store
+
+# locals
+static-tmp
+media
+*.sqlite3
+.env
+local_settings.py
+dist/*
+*egg-info/*
+django_log_analyser
+manage.py
