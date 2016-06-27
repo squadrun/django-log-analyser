@@ -6,8 +6,8 @@ from .models import DBLogReportDetail
 
 
 class LogFileAndReportDetailAdmin(admin.ModelAdmin):
-    list_display = ('log_datetime', 'log_report_path', 'report_link')
-    readonly_fields = ('log_datetime', 'log_file_path', 'log_report_path')
+    list_display = ('log_datetime', 'log_report_path', 'db_instance', 'report_link')
+    readonly_fields = ('log_datetime', 'log_file_path', 'db_instance', 'log_report_path')
 
     def report_link(self, obj):
         url = reverse('get-report', kwargs={'log_report_obj_id': obj.id})

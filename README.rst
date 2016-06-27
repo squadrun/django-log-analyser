@@ -42,7 +42,7 @@ Quick start
 
     AWS_REGION = "aws-region"
     BUCKET_LOG_ANALYSER = 'bucket-name'
-    RDS_DB_INSTANCE_IDENTIFIER = 'rds-db-instance-identifier'
+    RDS_DB_INSTANCE_IDENTIFIER = ['rds-db-instance-identifier-1', 'rds-db-instance-identifier-2' ...]
     AWS_ACCESS_KEY_ID = "aws-access-key"
     AWS_SECRET_ACCESS_KEY = "aws-secret-access-key"
 

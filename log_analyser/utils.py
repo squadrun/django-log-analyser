@@ -3,7 +3,7 @@ import logging
 import shutil
 import re
 import subprocess
-from datetime import datetime, timedelta
+from datetime import datetime
 
 from boto3.session import Session
 from botocore.exceptions import ClientError
@@ -28,19 +28,16 @@ s3_resource = aws_session.resource('s3')
 pattern_log_hour = re.compile('postgresql\.log\.([0-9-]+)')
 
 
-def fetch_log_from_rds():
-    last_log_report_obj = DBLogReportDetail.objects.order_by('-log_datetime').first()
-    log_datetime = last_log_report_obj.log_datetime + timedelta(hours=1) if last_log_report_obj is not None \
-        else datetime.utcnow() - timedelta(hours=1)
+def fetch_log_from_rds(log_datetime, db_instance):
     rds_log_file_name = get_rds_log_file_name(log_datetime)
-    rds_log_file_tmp_path = '/var/tmp/' + rds_log_file_name
+    rds_log_file_tmp_path = "/var/tmp/{0}_{1}".format(rds_log_file_name, db_instance)
 
     try:
         with open(rds_log_file_tmp_path, 'wb', buffering=50 * 1024) as postgres_log_file:
             additional_data_pending, marker = True, "0"
             while additional_data_pending:
                 response = rds_client.download_db_log_file_portion(
-                    DBInstanceIdentifier=settings.RDS_DB_INSTANCE_IDENTIFIER,
+                    DBInstanceIdentifier=db_instance,
                     LogFileName='error/'+rds_log_file_name,
                     Marker=marker
                 )
@@ -50,12 +47,13 @@ def fetch_log_from_rds():
                 additional_data_pending = response.get('AdditionalDataPending')
                 marker = response.get('Marker')
     except ClientError as e:
-        raise Exception(e.message)
+        logger.info(e.message)
+        return None
     else:
         return rds_log_file_tmp_path
 
 
-def upload_log_to_s3(log_file_path):
+def upload_log_to_s3(log_file_path, db_instance):
     compressed_log_file_path = log_file_path + '.gz'
     log_file_name = log_file_path.split('/')[-1]
     compressed_log_file_name = log_file_name + '.gz'
@@ -77,11 +75,12 @@ def upload_log_to_s3(log_file_path):
         else:
             log_file_report_obj = DBLogReportDetail.objects\
                 .create(log_datetime=log_hour_datetime,
-                        log_file_path=s3_directory_string_log + compressed_log_file_name)
+                        log_file_path=s3_directory_string_log + compressed_log_file_name,
+                        db_instance=db_instance)
             return log_file_report_obj
 
 
-def upload_report_to_s3(report_file_path):
+def upload_report_to_s3(report_file_path, db_instance):
     report_file_name = report_file_path.split('/')[-1]
     log_hour_datetime = datetime.strptime(pattern_log_hour.findall(report_file_name)[0], '%Y-%m-%d-%H')\
         .replace(tzinfo=utc, minute=0, second=0, microsecond=0)
@@ -93,7 +92,8 @@ def upload_report_to_s3(report_file_path):
         except ClientError as e:
             raise Exception(e.message)
         else:
-            log_report_obj = DBLogReportDetail.objects.filter(log_datetime=log_hour_datetime).first()
+            log_report_obj = DBLogReportDetail.objects\
+                .filter(log_datetime=log_hour_datetime, db_instance=db_instance).first()
             log_report_obj.log_report_path = s3_directory_string_report + report_file_name
             log_report_obj.save()
 
