@@ -77,7 +77,7 @@ def upload_log_to_s3(log_file_path, db_instance):
                 .create(log_datetime=log_hour_datetime,
                         log_file_path=s3_directory_string_log + compressed_log_file_name,
                         db_instance=db_instance)
-            return log_file_report_obj
+            return log_file_report_obj, compressed_log_file_path
 
 
 def upload_report_to_s3(report_file_path, db_instance):
@@ -128,3 +128,7 @@ def create_pgbadger_report_from_log(log_file_path):
     # TODO: Do not use shell=True
     subprocess.call(cmd, shell=True)
     return report_path
+
+
+def delete_unneeded_files(file_paths):
+    subprocess.call(['rm'] + file_paths, shell=True)
