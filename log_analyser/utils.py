@@ -131,4 +131,4 @@ def create_pgbadger_report_from_log(log_file_path):
 
 
 def delete_unneeded_files(file_paths):
-    subprocess.call(['rm'] + file_paths, shell=True)
+    subprocess.call(['rm'] + file_paths)
