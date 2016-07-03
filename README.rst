@@ -4,6 +4,13 @@
 Log Analyser
 ============
 
+Install django-log-analyser
+---------------------------
+Via pip::
+
+    pip install django-log-analyser
+
+
 Install pgbadger in Ubuntu
 --------------------------
 
