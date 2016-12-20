@@ -50,6 +50,7 @@ Quick start
     AWS_REGION = "aws-region"
     BUCKET_LOG_ANALYSER = 'bucket-name'
     RDS_DB_INSTANCE_IDENTIFIER = ['rds-db-instance-identifier-1', 'rds-db-instance-identifier-2' ...]
+    RDS_TEMP_LOG_FILE_LOCATION = "/var/tmp/"
     AWS_ACCESS_KEY_ID = "aws-access-key"
     AWS_SECRET_ACCESS_KEY = "aws-secret-access-key"
 

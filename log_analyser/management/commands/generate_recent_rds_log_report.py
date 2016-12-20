@@ -2,7 +2,6 @@ from datetime import timedelta, datetime
 from django.conf import settings
 from django.core.management import BaseCommand
 
-from log_analyser.constants import RDS_TEMP_LOG_FILE_LOCATION
 from log_analyser.models import DBLogReportDetail
 from log_analyser.utils import fetch_log_from_rds, upload_log_to_s3, upload_report_to_s3, \
     create_pgbadger_report_from_log, delete_unneeded_files
@@ -16,7 +15,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         db_instances = settings.RDS_DB_INSTANCE_IDENTIFIER
-        log_file_tmp_path = options.get('tmp_log_location') or RDS_TEMP_LOG_FILE_LOCATION
+        log_file_tmp_path = options.get('tmp_log_location') or settings.RDS_TEMP_LOG_FILE_LOCATION
 
         if type(db_instances) is not list:
             db_instances = [db_instances]
