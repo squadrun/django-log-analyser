@@ -11,7 +11,7 @@ from botocore.exceptions import ClientError
 from django.conf import settings
 from django.utils.timezone import utc
 
-from .constants import PREFIX_DIRECTORY_LOGS, PREFIX_DIRECTORY_REPORTS
+from .constants import PREFIX_DIRECTORY_LOGS, PREFIX_DIRECTORY_REPORTS, RDS_TEMP_LOG_FILE_LOCATION
 from .models import DBLogReportDetail
 
 
@@ -28,9 +28,11 @@ s3_resource = aws_session.resource('s3')
 pattern_log_hour = re.compile('postgresql\.log\.([0-9-]+)')
 
 
-def fetch_log_from_rds(log_datetime, db_instance):
+def fetch_log_from_rds(log_datetime, db_instance, temp_log_file_location=None):
     rds_log_file_name = get_rds_log_file_name(log_datetime)
-    rds_log_file_tmp_path = "/var/tmp/{0}_{1}".format(rds_log_file_name, db_instance)
+    temp_log_file_location = temp_log_file_location or RDS_TEMP_LOG_FILE_LOCATION
+
+    rds_log_file_tmp_path = "{0}/{1}_{2}".format(temp_log_file_location, rds_log_file_name, db_instance)
 
     try:
         with open(rds_log_file_tmp_path, 'wb', buffering=50 * 1024) as postgres_log_file:

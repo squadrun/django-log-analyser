@@ -2,14 +2,22 @@ from datetime import timedelta, datetime
 from django.conf import settings
 from django.core.management import BaseCommand
 
+from log_analyser.constants import RDS_TEMP_LOG_FILE_LOCATION
 from log_analyser.models import DBLogReportDetail
 from log_analyser.utils import fetch_log_from_rds, upload_log_to_s3, upload_report_to_s3, \
     create_pgbadger_report_from_log, delete_unneeded_files
 
 
 class Command(BaseCommand):
+    help = "Management command to Generate Report for RDS Postgres Logs"
+
+    def add_arguments(self, parser):
+        parser.add_argument('--tmp_log_location', action="store", type=str, required=False)
+
     def handle(self, *args, **options):
         db_instances = settings.RDS_DB_INSTANCE_IDENTIFIER
+        log_file_tmp_path = options.get('tmp_log_location') or RDS_TEMP_LOG_FILE_LOCATION
+
         if type(db_instances) is not list:
             db_instances = [db_instances]
 
@@ -18,7 +26,7 @@ class Command(BaseCommand):
             else datetime.utcnow() - timedelta(hours=1)
 
         for db_instance in db_instances:
-            rds_log_file_tmp_path = fetch_log_from_rds(log_datetime, db_instance)
+            rds_log_file_tmp_path = fetch_log_from_rds(log_datetime, db_instance, log_file_tmp_path)
             if rds_log_file_tmp_path is not None:
                 self.stdout.write('Log from RDS stored at {0}'.format(rds_log_file_tmp_path))
 
