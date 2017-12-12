@@ -44,4 +44,4 @@ class Command(BaseCommand):
 
                     files_to_delete = [rds_log_file_tmp_path, report_path, compressed_log_file_path]
                     delete_unneeded_files(files_to_delete)
-             log_datetime = log_datetime + timedelta(hours=1)
+            log_datetime = log_datetime + timedelta(hours=1)
