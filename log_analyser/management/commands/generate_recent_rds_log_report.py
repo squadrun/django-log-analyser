@@ -27,19 +27,21 @@ class Command(BaseCommand):
         log_datetime = log_datetime if log_datetime > timezone.now() - timedelta(hours=48) \
             else timezone.now() - timedelta(hours=48)
 
-        for db_instance in db_instances:
-            rds_log_file_tmp_path = fetch_log_from_rds(log_datetime, db_instance, log_file_tmp_path)
-            if rds_log_file_tmp_path is not None:
-                self.stdout.write('Log from RDS stored at {0}'.format(rds_log_file_tmp_path))
+        while log_datetime <= timezone.now() - timedelta(hours=1):
+            for db_instance in db_instances:
+                rds_log_file_tmp_path = fetch_log_from_rds(log_datetime, db_instance, log_file_tmp_path)
+                if rds_log_file_tmp_path is not None:
+                    self.stdout.write('Log from RDS stored at {0}'.format(rds_log_file_tmp_path))
 
-                log_file_report_obj, compressed_log_file_path = upload_log_to_s3(rds_log_file_tmp_path, db_instance)
-                self.stdout.write('Log file for object ID: {0} uploaded to S3'.format(log_file_report_obj.id))
+                    log_file_report_obj, compressed_log_file_path = upload_log_to_s3(rds_log_file_tmp_path, db_instance)
+                    self.stdout.write('Log file for object ID: {0} uploaded to S3'.format(log_file_report_obj.id))
 
-                report_path = create_pgbadger_report_from_log(rds_log_file_tmp_path)
-                self.stdout.write('Report stored at {0}'.format(report_path))
+                    report_path = create_pgbadger_report_from_log(rds_log_file_tmp_path)
+                    self.stdout.write('Report stored at {0}'.format(report_path))
 
-                upload_report_to_s3(report_path, db_instance)
-                self.stdout.write('Report for log uploaded to S3')
+                    upload_report_to_s3(report_path, db_instance)
+                    self.stdout.write('Report for log uploaded to S3')
 
-                files_to_delete = [rds_log_file_tmp_path, report_path, compressed_log_file_path]
-                delete_unneeded_files(files_to_delete)
+                    files_to_delete = [rds_log_file_tmp_path, report_path, compressed_log_file_path]
+                    delete_unneeded_files(files_to_delete)
+             log_datetime = log_datetime + timedelta(hours=1)
