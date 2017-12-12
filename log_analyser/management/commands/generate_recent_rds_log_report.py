@@ -1,5 +1,6 @@
-from datetime import timedelta, datetime
+from datetime import timedelta
 from django.conf import settings
+from django.utils import timezone
 from django.core.management import BaseCommand
 
 from log_analyser.models import DBLogReportDetail
@@ -22,9 +23,9 @@ class Command(BaseCommand):
 
         last_log_report_obj = DBLogReportDetail.objects.order_by('-log_datetime').first()
         log_datetime = last_log_report_obj.log_datetime + timedelta(hours=1) if last_log_report_obj is not None \
-            else datetime.utcnow() - timedelta(hours=1)
-        log_datetime = log_datetime if log_datetime > datetime.utcnow() - timedelta(hours=48) \
-            else log_datetime > datetime.utcnow() - timedelta(hours=48)
+            else timezone.now() - timedelta(hours=1)
+        log_datetime = log_datetime if log_datetime > timezone.now() - timedelta(hours=48) \
+            else log_datetime > timezone.now() - timedelta(hours=48)
 
         for db_instance in db_instances:
             rds_log_file_tmp_path = fetch_log_from_rds(log_datetime, db_instance, log_file_tmp_path)
