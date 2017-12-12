@@ -25,7 +25,7 @@ class Command(BaseCommand):
         log_datetime = last_log_report_obj.log_datetime + timedelta(hours=1) if last_log_report_obj is not None \
             else timezone.now() - timedelta(hours=1)
         log_datetime = log_datetime if log_datetime > timezone.now() - timedelta(hours=48) \
-            else log_datetime > timezone.now() - timedelta(hours=48)
+            else timezone.now() - timedelta(hours=48)
 
         for db_instance in db_instances:
             rds_log_file_tmp_path = fetch_log_from_rds(log_datetime, db_instance, log_file_tmp_path)
