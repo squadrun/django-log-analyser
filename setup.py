@@ -12,7 +12,7 @@ setup(
     version='0.2.5',
     packages=find_packages(),
     install_requires=[
-        'boto3==1.3.1',
+        'boto3>=1.3.1',
         'django>=1.7',
     ],
     include_package_data=True,
